@@ -1,0 +1,43 @@
+digraph INFRA {
+  node [ color = "black", fillcolor = "#E6E6E6", height =1, style = "filled,bold,rounded", fontname = "Arial" ];
+  "aws_codestarconnections_connection.source_repo" [ label = "aws_codestarconnections_connection.source_repo
+(AWS::CodeStarConnections::Connection)", shape =rectangle ];
+  "aws_iam_role.lambda_role" [ label = "aws_iam_role.lambda_role
+(AWS::IAM::Role)", shape =rectangle ];
+  "aws_lambda_function.transform_trigger" [ label = "aws_lambda_function.transform_trigger
+(AWS::Lambda::Function)", shape =rectangle, fillcolor = "#B7E0FF" ];
+  "aws_lambda_function.poll_connection_status" [ label = "aws_lambda_function.poll_connection_status
+(AWS::Lambda::Function)", shape =rectangle, fillcolor = "#B7E0FF" ];
+  "aws_cloudwatch_event_rule.poll_connection_schedule" [ label = "aws_cloudwatch_event_rule.poll_connection_schedule
+(AWS::Events::Rule)", shape =rectangle ];
+  "aws_cloudwatch_event_target.poll_target" [ label = "aws_cloudwatch_event_target.poll_target
+(AWS::Events::Target)", shape =rectangle ];
+  "aws_lambda_permission.allow_scheduled_poll" [ label = "aws_lambda_permission.allow_scheduled_poll
+(AWS::Lambda::Permission)", shape =rectangle ];
+  "aws_iam_policy.lambda_codestar_policy" [ label = "aws_iam_policy.lambda_codestar_policy
+(AWS::IAM::Policy)", shape =rectangle ];
+  "aws_iam_role_policy_attachment.lambda_codestar_attach" [ label = "aws_iam_role_policy_attachment.lambda_codestar_attach
+(AWS::IAM::PolicyAttachment)", shape =rectangle ];
+  "aws_iam_role_policy_attachment.lambda_basic" [ label = "aws_iam_role_policy_attachment.lambda_basic
+(AWS::IAM::PolicyAttachment)", shape =rectangle ];
+  "aws_iam_policy.lambda_manage_trigger_policy" [ label = "aws_iam_policy.lambda_manage_trigger_policy
+(AWS::IAM::Policy)", shape =rectangle ];
+  "aws_iam_role_policy_attachment.lambda_manage_trigger_attach" [ label = "aws_iam_role_policy_attachment.lambda_manage_trigger_attach
+(AWS::IAM::PolicyAttachment)", shape =rectangle ];
+  "aws_lambda_function.transform_trigger" -> "aws_iam_role.lambda_role";
+  "aws_lambda_function.transform_trigger" -> "aws_codestarconnections_connection.source_repo";
+  "aws_lambda_function.poll_connection_status" -> "aws_iam_role.lambda_role";
+  "aws_lambda_function.poll_connection_status" -> "aws_codestarconnections_connection.source_repo";
+  "aws_lambda_function.poll_connection_status" -> "aws_cloudwatch_event_rule.poll_connection_schedule";
+  "aws_cloudwatch_event_target.poll_target" -> "aws_cloudwatch_event_rule.poll_connection_schedule";
+  "aws_cloudwatch_event_target.poll_target" -> "aws_lambda_function.poll_connection_status";
+  "aws_lambda_permission.allow_scheduled_poll" -> "aws_lambda_function.poll_connection_status";
+  "aws_lambda_permission.allow_scheduled_poll" -> "aws_cloudwatch_event_rule.poll_connection_schedule";
+  "aws_iam_role_policy_attachment.lambda_codestar_attach" -> "aws_iam_role.lambda_role";
+  "aws_iam_role_policy_attachment.lambda_codestar_attach" -> "aws_iam_policy.lambda_codestar_policy";
+  "aws_iam_role_policy_attachment.lambda_basic" -> "aws_iam_role.lambda_role";
+  "aws_iam_policy.lambda_manage_trigger_policy" -> "aws_lambda_function.transform_trigger";
+  "aws_iam_policy.lambda_manage_trigger_policy" -> "aws_cloudwatch_event_rule.poll_connection_schedule";
+  "aws_iam_role_policy_attachment.lambda_manage_trigger_attach" -> "aws_iam_role.lambda_role";
+  "aws_iam_role_policy_attachment.lambda_manage_trigger_attach" -> "aws_iam_policy.lambda_manage_trigger_policy";
+}
