@@ -9,3 +9,7 @@ variable "transform_trigger_arn" {
 variable "poll_connection_schedule_arn" {
     type = string
 }
+
+variable "user_suffix" {
+    type = string
+}

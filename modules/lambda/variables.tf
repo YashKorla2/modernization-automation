@@ -17,3 +17,7 @@ variable "connection_arn" {
 variable "lambda_role_arn" {
     type = string
 }
+
+variable "user_suffix" {
+    type = string
+}

@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------------------------------------------
 
 # Name of the CodeStar Connection
-connection_name = "automated-github-connection"
+connection_name = "gh-conn"
 
 # Git provider: supported values are "GitHub", "GitLab", "Bitbucket", etc.
 provider_type = "GitHub"

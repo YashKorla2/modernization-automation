@@ -9,14 +9,25 @@
 # ---------------------------------------------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------------------------------------------
+# Get account identity for dynamically naming resources
+# ---------------------------------------------------------------------------------------------------------------
+data "aws_caller_identity" "current" {}
+
+locals {
+  raw_user_suffix = replace(data.aws_caller_identity.current.arn, "arn:aws:iam::${data.aws_caller_identity.current.account_id}:", "")
+  user_suffix     = replace(replace(replace(local.raw_user_suffix, "/", "-"), ".", "-"), "@", "-")
+}
+
+# ---------------------------------------------------------------------------------------------------------------
 # Registers the "iam" module and passes the "region" value.
 # Creates the IAM Role for performing other actions in the process.
 # ---------------------------------------------------------------------------------------------------------------
 module "iam" {
-  source = "./modules/iam"
-  region = var.region
-  transform_trigger_arn = module.lambda.transform_trigger_arn
+  source                       = "./modules/iam"
+  region                       = var.region
+  transform_trigger_arn       = module.lambda.transform_trigger_arn
   poll_connection_schedule_arn = module.lambda.poll_connection_schedule_arn
+  user_suffix                 = local.user_suffix
 }
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -24,12 +35,13 @@ module "iam" {
 # Creates the lambda functions.
 # ---------------------------------------------------------------------------------------------------------------
 module "lambda" {
-  source = "./modules/lambda"
-  repository_url = var.repository_url
-  branch_name = var.branch_name
-  output_branch = var.output_branch
-  connection_arn = aws_codestarconnections_connection.source_repo.arn
+  source          = "./modules/lambda"
+  repository_url  = var.repository_url
+  branch_name     = var.branch_name
+  output_branch   = var.output_branch
+  connection_arn  = aws_codestarconnections_connection.source_repo.arn
   lambda_role_arn = module.iam.lambda_role_arn
+  user_suffix     = local.user_suffix
 }
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -45,6 +57,6 @@ provider "aws" {
 # Uses the variables.tf and terraform.tfvars files to pass the values for the connection. 
 # ---------------------------------------------------------------------------------------------------------------
 resource "aws_codestarconnections_connection" "source_repo" {
-  name          = var.connection_name
+  name          = "${var.connection_name}-${local.user_suffix}"
   provider_type = var.provider_type
 }

@@ -14,7 +14,7 @@
 # -------------------------------------------------------------------------------------------------------------
 resource "aws_lambda_function" "transform_trigger" {
   filename         = "lambda.zip"
-  function_name    = "trigger-code-transform"
+  function_name    = "trigger-code-transform-${var.user_suffix}"
   role             = var.lambda_role_arn
   handler          = "transform_trigger.lambda_handler"
   runtime          = "python3.9"
@@ -42,7 +42,7 @@ resource "aws_lambda_function" "transform_trigger" {
 # -------------------------------------------------------------------------------------------------------------
 resource "aws_lambda_function" "poll_connection_status" {
   filename         = "lambda_status.zip"
-  function_name    = "poll-connection-status"
+  function_name    = "poll-connection-status-${var.user_suffix}"
   role             = var.lambda_role_arn
   handler          = "poll_connection_status.lambda_handler"
   runtime          = "python3.9"
@@ -63,7 +63,7 @@ resource "aws_lambda_function" "poll_connection_status" {
 # Sets the polling rate to 5 minutes.
 # -------------------------------------------------------------------------------------------------------------
 resource "aws_cloudwatch_event_rule" "poll_connection_schedule" {
-  name                = "poll-connection-status"
+  name                = "poll-connection-status-${var.user_suffix}"
   schedule_expression = "rate(5 minutes)"
 }
 
@@ -79,7 +79,7 @@ resource "aws_cloudwatch_event_target" "poll_target" {
 # Allows the EventBridge Rule to invoke the Lambda Function.
 # -------------------------------------------------------------------------------------------------------------
 resource "aws_lambda_permission" "allow_scheduled_poll" {
-  statement_id  = "AllowScheduledInvoke"
+  statement_id  = "AllowScheduledInvoke-${var.user_suffix}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.poll_connection_status.function_name
   principal     = "events.amazonaws.com"
